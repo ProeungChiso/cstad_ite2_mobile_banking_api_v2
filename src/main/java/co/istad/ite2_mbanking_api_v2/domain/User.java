@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Setter
@@ -20,7 +21,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String uuid;
     @Column(unique = true, nullable = false)
-    private String nationalIdCard;
+    private String nationalCardId;
     @Column(nullable = false)
     private Integer pin;
     @Column(unique = true, nullable = false)
@@ -63,5 +64,9 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> roles;
+
+    private Boolean isDeleted;
+    private Boolean isBlocked;
+    private LocalDateTime createdAt;
 
 }
