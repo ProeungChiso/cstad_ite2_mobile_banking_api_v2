@@ -30,14 +30,8 @@ public class MediaController {
     MediaResponse deleteMediaByName(@PathVariable String mediaName){
         return mediaService.deleteMediaByName(mediaName, "IMAGE");
     }
-
     @GetMapping("/{folder}/all")
     List<MediaResponse> loadAllMedia(@PathVariable String folder){
         return mediaService.loadAllMedia(folder);
-    }
-
-    @GetMapping("/{link}")
-    ResponseEntity<Resource> downloadMedia(@PathVariable String link){
-        return mediaService.downloadMedia(link, "IMAGE");
     }
 }

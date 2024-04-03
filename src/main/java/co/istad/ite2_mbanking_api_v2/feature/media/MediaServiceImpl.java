@@ -10,16 +10,21 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -31,7 +36,7 @@ public class MediaServiceImpl implements MediaService {
     private String serverPath;
     @Value("${media.base-uri}")
     private String baseUri;
-    private ResourceLoader resourceLoader;
+    private RestTemplate restTemplate;
 
     @Override
     public MediaResponse uploadSingle(MultipartFile file, String folderName) {
@@ -106,36 +111,35 @@ public class MediaServiceImpl implements MediaService {
     public List<MediaResponse> loadAllMedia(String folderName) {
         Path path = Paths.get(serverPath, folderName);
         log.info("path {}", path);
-        List<MediaResponse> mediaResponses = new ArrayList<>();
         try (Stream<Path> files = Files.list(path)) {
-            if (files.findAny().isEmpty()) {
-                log.warn("No media files found in folder: {}", folderName);
-            } else {
-                files.forEach(media -> {
-                    try {
-                        String mediaName = media.getFileName().toString();
-                        Resource resource = new UrlResource(media.toUri());
-                        if (!resource.exists() || !Files.isRegularFile(media)) {
-                            throw new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "Media has been not found!");
-                        }
-                        MediaResponse mediaResponse = MediaResponse.builder()
-                                .name(mediaName)
-                                .contentType(Files.probeContentType(media))
-                                .extension(MediaUtil.extractExtension(mediaName))
-                                .size(resource.contentLength())
-                                .uri(String.format("%s%s/%s", baseUri, folderName, mediaName))
-                                .build();
-                        mediaResponses.add(mediaResponse);
-                    } catch (IOException e) {
+            List<MediaResponse> mediaResponses = files.map(media -> {
+                try {
+                    String mediaName = media.getFileName().toString();
+                    Resource resource = new UrlResource(media.toUri());
+                    if (!resource.exists() || !Files.isRegularFile(media)) {
                         throw new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
-                                "Media has been not found!"
-                        );
+                                "Media has been not found!");
                     }
-                });
+                    return MediaResponse.builder()
+                            .name(mediaName)
+                            .contentType(Files.probeContentType(media))
+                            .extension(MediaUtil.extractExtension(mediaName))
+                            .size(resource.contentLength())
+                            .uri(String.format("%s%s/%s", baseUri, folderName, mediaName))
+                            .build();
+                } catch (IOException e) {
+                    throw new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "Media has been not found!"
+                    );
+                }
+            }).collect(Collectors.toList());
+
+            if (mediaResponses.isEmpty()) {
+                log.warn("No media files found in folder: {}", folderName);
             }
+
             return mediaResponses;
         } catch (IOException e) {
             throw new ResponseStatusException(
@@ -144,6 +148,7 @@ public class MediaServiceImpl implements MediaService {
             );
         }
     }
+
 
     @Override
     public MediaResponse deleteMediaByName(String mediaName, String folderName) {
@@ -166,11 +171,6 @@ public class MediaServiceImpl implements MediaService {
                     String.format("Media path %s cannot be deleted!", e.getLocalizedMessage()));
         }
 
-    }
-
-    @Override
-    public ResponseEntity<Resource> downloadMedia(String link, String folderName) {
-        return null;
     }
 
 
