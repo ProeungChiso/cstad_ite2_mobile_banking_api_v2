@@ -15,7 +15,6 @@ public class AccountTypeController {
     List<AccountTypeResponse> findList(){
         return accountTypeService.findList();
     }
-
     @GetMapping("/{alias}")
     AccountTypeResponse findByAlias(@PathVariable String alias){
         return accountTypeService.findByAlias(alias);
