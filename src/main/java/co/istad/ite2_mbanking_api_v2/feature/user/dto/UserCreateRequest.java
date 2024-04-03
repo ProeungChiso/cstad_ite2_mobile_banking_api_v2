@@ -3,6 +3,7 @@ package co.istad.ite2_mbanking_api_v2.feature.user.dto;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 public record UserCreateRequest(
@@ -29,6 +30,8 @@ public record UserCreateRequest(
         @Size(max = 20)
         String nationalCardId,
         @Size(max = 20)
-        String studentIdCard
+        String studentIdCard,
+        @NotEmpty
+        List<RoleRequest> roles
 ) {
 }
