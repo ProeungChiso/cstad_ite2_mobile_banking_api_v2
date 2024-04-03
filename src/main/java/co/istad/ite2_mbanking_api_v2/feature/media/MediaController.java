@@ -28,4 +28,9 @@ public class MediaController {
     MediaResponse deleteMediaByName(@PathVariable String mediaName){
         return mediaService.deleteMediaByName(mediaName, "IMAGE");
     }
+
+    @GetMapping("/{folder}/all")
+    List<MediaResponse> loadAllMedia(@PathVariable String folder){
+        return mediaService.loadAllMedia(folder);
+    }
 }
