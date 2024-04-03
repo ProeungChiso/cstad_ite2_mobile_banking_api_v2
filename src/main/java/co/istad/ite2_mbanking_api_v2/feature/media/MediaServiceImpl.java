@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,4 +167,11 @@ public class MediaServiceImpl implements MediaService {
         }
 
     }
+
+    @Override
+    public ResponseEntity<Resource> downloadMedia(String link, String folderName) {
+        return null;
+    }
+
+
 }
