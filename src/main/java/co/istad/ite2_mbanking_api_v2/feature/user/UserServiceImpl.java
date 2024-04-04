@@ -10,6 +10,7 @@ import co.istad.ite2_mbanking_api_v2.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -28,28 +29,32 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    @Value("${media.base-uri}")
+    private String mediaBaseUri;
+
     @Override
     public void createNew(UserCreateRequest request) {
 
-        if(userRepository.existsByPhoneNumber(request.phoneNumber())){
+        if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Phone number has already been existed!"
             );
         }
-        if(userRepository.existsByStudentIdCard(request.studentIdCard())){
+        if (userRepository.existsByStudentIdCard(request.studentIdCard())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Student card ID has already been existed!"
             );
         }
-        if(userRepository.existsByNationalCardId(request.nationalCardId())){
+        if (userRepository.existsByNationalCardId(request.nationalCardId())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "National card ID has already been existed!"
             );
         }
-        if(!request.password().equals(request.confirmedPassword())){
+        if (!request.password().equals(request.confirmedPassword())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Password doesn't match!"
@@ -113,6 +118,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
 
     }
+
     @Transactional
     @Override
     public BasedMessage blockByUuid(String uuid) {
@@ -135,5 +141,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public String updateProfileImage(String mediaName, String uuid) {
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "User has not been found!"));
 
+        user.setProfileImage(mediaName);
+        userRepository.save(user);
+        return mediaBaseUri + "IMAGE/" + mediaName;
+    }
 }

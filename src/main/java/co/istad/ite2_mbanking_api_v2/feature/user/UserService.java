@@ -13,5 +13,6 @@ public interface UserService {
     UserResponse updateByUuid(String uuid, UserUpdateRequest request);
     BasedMessage blockByUuid(String uuid);
     void deleteByUuid(String uuid);
+    String updateProfileImage(String mediaName, String uuid);
 
 }

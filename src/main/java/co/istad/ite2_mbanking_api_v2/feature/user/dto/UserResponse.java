@@ -7,6 +7,7 @@ public record UserResponse(
         String uuid,
         String name,
         LocalDate dob,
+        String profileImage,
         String phoneNumber,
         String studentIdCard
 ) {

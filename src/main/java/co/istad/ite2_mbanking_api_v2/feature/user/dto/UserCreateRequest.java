@@ -7,31 +7,31 @@ import java.util.List;
 
 @Builder
 public record UserCreateRequest(
-        @NotNull
-        @Max(9999)
-        @Positive
+        @NotNull(message = "Pin is required")
+        @Max(value = 9999, message = "Pin must 4 digits")
+        @Positive(message = "Pin must be not positive")
         Integer pin,
-        @NotBlank
-        @Size(max = 20)
+        @NotBlank(message = "Phone Number is required")
+        @Size(max = 20, message = "Phone Number must me less than 20 characters")
         String phoneNumber,
-        @NotBlank
+        @NotBlank(message = "Password is required")
         String password,
-        @NotBlank
+        @NotBlank(message = "Confirm password is required")
         String confirmedPassword,
-        @NotBlank
+        @NotBlank(message = "Name is required")
         @Size(max = 40)
         String name,
-        @NotBlank
+        @NotBlank(message = "Gender is required")
         @Size(max = 6)
         String gender,
-        @NotNull
+        @NotNull(message = "Date of birth is required")
         LocalDate dob,
-        @NotBlank
-        @Size(max = 20)
+        @NotBlank(message = "National Card ID is required")
+        @Size(max = 20, message = "National Card ID must be less than 20 characters")
         String nationalCardId,
-        @Size(max = 20)
+        @Size(max = 20, message = "Student Card ID must be less than 20 characters")
         String studentIdCard,
-        @NotEmpty
+        @NotEmpty(message = "Roles is required")
         List<RoleRequest> roles
 ) {
 }
