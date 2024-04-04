@@ -6,20 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +163,17 @@ public class MediaServiceImpl implements MediaService {
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     String.format("Media path %s cannot be deleted!", e.getLocalizedMessage()));
+        }
+
+    }
+    @Override
+    public Resource downloadMediaByName(String mediaName, String folderName) {
+        Path path = Paths.get(serverPath + folderName + "\\" + mediaName);
+        try {
+            return new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Media has not been found!");
         }
 
     }
