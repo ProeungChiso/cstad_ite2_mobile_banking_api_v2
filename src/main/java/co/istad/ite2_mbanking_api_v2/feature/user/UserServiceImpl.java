@@ -3,9 +3,7 @@ package co.istad.ite2_mbanking_api_v2.feature.user;
 import co.istad.ite2_mbanking_api_v2.base.BasedMessage;
 import co.istad.ite2_mbanking_api_v2.domain.Role;
 import co.istad.ite2_mbanking_api_v2.domain.User;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserCreateRequest;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserResponse;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserUpdateRequest;
+import co.istad.ite2_mbanking_api_v2.feature.user.dto.*;
 import co.istad.ite2_mbanking_api_v2.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -151,5 +149,40 @@ public class UserServiceImpl implements UserService {
         user.setProfileImage(mediaName);
         userRepository.save(user);
         return mediaBaseUri + "IMAGE/" + mediaName;
+    }
+
+    @Override
+    public void updateUserPasswordByUuid(String uuid, String newPassword) {
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(()->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "User has not been found!"));
+        user.setPassword(newPassword);
+        userRepository.save(user);
+        userMapper.userDetailResponse(user);
+    }
+
+    @Override
+    public void updateUserDetailByUuid(String uuid, UserDetailUpdateRequest request) {
+        if(!userRepository.existsByUuid(uuid)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "User has not been found!"
+            );
+        }
+        User user = userRepository.findAll().stream()
+                .filter(us -> us.getUuid().equals(uuid))
+                .findFirst().orElseThrow();
+
+        user.setCityOrProvince(request.cityOrProvince());
+        user.setKhanOrDistrict(request.khanOrDistrict());
+        user.setEmployeeType(request.employeeType());
+        user.setPosition(request.position());
+        user.setCompanyName(request.companyName());
+        user.setMainSourceOfIncome(request.mainSourceOfIncome());
+        user.setMonthlyIncomeRange(request.monthlyIncomeRange());
+
+        userRepository.save(user);
+
     }
 }

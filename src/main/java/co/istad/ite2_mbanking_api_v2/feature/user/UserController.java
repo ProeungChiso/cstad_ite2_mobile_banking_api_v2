@@ -2,10 +2,7 @@ package co.istad.ite2_mbanking_api_v2.feature.user;
 
 import co.istad.ite2_mbanking_api_v2.base.BasedMessage;
 import co.istad.ite2_mbanking_api_v2.base.BasedResponse;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserCreateRequest;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserProfileImageRequest;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserResponse;
-import co.istad.ite2_mbanking_api_v2.feature.user.dto.UserUpdateRequest;
+import co.istad.ite2_mbanking_api_v2.feature.user.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -59,6 +56,17 @@ public class UserController {
         return BasedResponse.builder()
                 .payload(newProfileImageUri)
                 .build();
+    }
+
+    @PatchMapping("/update-password/{uuid}")
+    void updatePassword(@PathVariable String uuid,
+                                       @RequestParam String newPassword){
+        userService.updateUserPasswordByUuid(uuid, newPassword);
+    }
+
+    @PatchMapping("/update-user/{uuid}")
+    void updateUserDetailByUuid(@PathVariable String uuid, @RequestBody UserDetailUpdateRequest request) {
+        userService.updateUserDetailByUuid(uuid, request);
     }
 
 

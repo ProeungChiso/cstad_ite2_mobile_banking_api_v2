@@ -37,7 +37,7 @@ public class User {
     @Column(length = 100)
     private String cityOrProvince;
     @Column(length = 100)
-    private String khanOrCommune;
+    private String khanOrDistrict;
     @Column(length = 100)
     private String village;
     @Column(length = 100)
