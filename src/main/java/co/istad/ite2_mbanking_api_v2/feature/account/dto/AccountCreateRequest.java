@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record AccountCreateRequest(
-        @NotBlank
+        @NotBlank(message = "Alias is required")
         String alias,
         @NotNull
         BigDecimal balance,
