@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -129,4 +130,21 @@ public class AccountServiceImpl implements AccountService{
             );
         }
     }
+
+    @Transactional
+    @Override
+    public void updateTransferLimit(BigDecimal transferLimit) {
+        if (transferLimit.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Transfer limit must be a positive"
+            );
+        }
+        List<Account> accounts = accountRepository.findAll();
+        accounts.forEach(account -> {
+            account.setTransferLimit(transferLimit);
+            accountRepository.save(account);
+        });
+    }
+
 }

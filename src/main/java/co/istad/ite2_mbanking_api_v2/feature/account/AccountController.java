@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -49,4 +51,9 @@ public class AccountController {
         return accountService.findList(page, size);
     }
 
+    @GetMapping("/update/transferLimit")
+    void updateTransferLimit(@RequestParam BigDecimal transferLimit){
+        log.info("Transfer Limit: {}", transferLimit);
+        accountService.updateTransferLimit(transferLimit);
+    }
 }
