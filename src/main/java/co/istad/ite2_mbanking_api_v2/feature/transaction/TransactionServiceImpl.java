@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,12 +75,49 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public Page<TransactionResponse> getTransactions(int page, int size, String sort, String transaction_type) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Transaction> transactions = transactionRepository.findAll(pageRequest);
 
-        if(transactions.getTotalElements() == 0){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No transactions found");
+        //check page and size
+        if(page < 0 || size < 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "page must be a positive integer, and size must be a positive integer"
+            );
         }
+
+        PageRequest pageRequest;
+
+        // check if key sort is not null and empty
+        if (sort != null && !sort.isEmpty()) {
+            Sort.Direction direction = Sort.Direction.DESC;
+            if (sort.equalsIgnoreCase("asc")) {
+                direction = Sort.Direction.ASC;
+            }
+            pageRequest = PageRequest.of(page, size, Sort.by(direction, "transactionAt"));
+        } else {
+            // If key sort has no value
+            pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "transactionAt"));
+        }
+        Page<Transaction> transactions;
+
+        //check transaction if not empty
+        if (transaction_type != null && !transaction_type.isEmpty()) {
+            //display transfer or payment
+            String transactionType = transaction_type.toUpperCase();
+            transactions = transactionRepository.findByTransactionType(transactionType, pageRequest);
+        } else {
+            //display all
+            transactions = transactionRepository.findAll(pageRequest);
+        }
+
+        //check transactions
+        if (transactions.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No transactions found");
+        }
+
+        //return page
         return transactions.map(transactionMapper::toTransactionResponse);
     }
+
 }

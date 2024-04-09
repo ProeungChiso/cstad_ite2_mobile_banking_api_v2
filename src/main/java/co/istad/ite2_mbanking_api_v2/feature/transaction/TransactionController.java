@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/transactions")
@@ -30,6 +28,9 @@ public class TransactionController {
                                                  @RequestParam(required = false, defaultValue = "1") int size
                                                  )
     {
+
+        log.info("transactionType={}, page={}, size={}", transactionType, page, size);
+
         return transactionService.getTransactions(page, size, sort, transactionType);
     }
 }
