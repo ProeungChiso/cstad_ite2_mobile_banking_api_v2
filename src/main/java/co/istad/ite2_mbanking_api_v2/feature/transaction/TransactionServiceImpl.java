@@ -8,6 +8,8 @@ import co.istad.ite2_mbanking_api_v2.feature.transaction.dto.TransactionResponse
 import co.istad.ite2_mbanking_api_v2.mapper.TransactionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +73,13 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     @Override
-    public List<TransactionResponse> getTransactions() {
-        return List.of();
+    public Page<TransactionResponse> getTransactions(int page, int size, String sort, String transaction_type) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Transaction> transactions = transactionRepository.findAll(pageRequest);
+
+        if(transactions.getTotalElements() == 0){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No transactions found");
+        }
+        return transactions.map(transactionMapper::toTransactionResponse);
     }
 }
