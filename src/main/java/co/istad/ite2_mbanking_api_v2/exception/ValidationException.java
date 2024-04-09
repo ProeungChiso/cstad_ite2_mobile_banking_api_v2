@@ -29,5 +29,6 @@ public class ValidationException {
         basedError.setCode(HttpStatus.BAD_GATEWAY.getReasonPhrase());
         basedError.setDescription(errors);
         return new BasedErrorResponse(basedError);
+
     }
 }
