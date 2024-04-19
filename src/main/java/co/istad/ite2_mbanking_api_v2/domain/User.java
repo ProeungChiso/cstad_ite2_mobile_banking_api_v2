@@ -59,12 +59,15 @@ public class User {
     @OneToMany
     private List<UserAccount> userAccountList;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> roles;
 
+    private boolean isAccountNonExpired;
+    private boolean isAccountNonLocked;
+    private boolean isCredentialsNonExpired;
     private Boolean isDeleted;
     private Boolean isBlocked;
     private LocalDateTime createdAt;
