@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,6 +76,11 @@ public class SecurityConfig {
         );
 
         http.httpBasic(Customizer.withDefaults());
+
+        //Disable CSRF
+        http.csrf(token -> token.disable());
+        //Change to Stateless
+        http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
