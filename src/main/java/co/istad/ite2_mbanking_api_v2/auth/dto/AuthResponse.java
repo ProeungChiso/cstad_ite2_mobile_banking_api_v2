@@ -1,6 +1,6 @@
-package co.istad.ite2_mbanking_api_v2.feature.auth.dto;
+package co.istad.ite2_mbanking_api_v2.auth.dto;
 
-public record AuthDto(
+public record AuthResponse(
         String type,
         String accessToken,
         String refreshToken

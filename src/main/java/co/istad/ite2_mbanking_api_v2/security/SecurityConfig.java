@@ -95,6 +95,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/api/v1/accounts/**").hasRole("ADMIN")
