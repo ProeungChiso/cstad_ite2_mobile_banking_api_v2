@@ -2,6 +2,7 @@ package co.istad.ite2_mbanking_api_v2.auth;
 
 import co.istad.ite2_mbanking_api_v2.auth.dto.AuthResponse;
 import co.istad.ite2_mbanking_api_v2.auth.dto.LoginRequest;
+import co.istad.ite2_mbanking_api_v2.auth.dto.RefreshTokenRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,11 @@ public class AuthController {
     @PostMapping("/login")
     AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
+    }
+
+    @PostMapping("/refresh")
+    AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return authService.refresh(refreshTokenRequest);
     }
 
 }
