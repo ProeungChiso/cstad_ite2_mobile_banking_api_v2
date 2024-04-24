@@ -8,21 +8,26 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final DaoAuthenticationProvider daoAuthenticationProvider;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final JwtEncoder jwtEncoder;
+
+    //login payload with custom
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -35,6 +40,12 @@ public class AuthServiceImpl implements AuthService {
                 grantedAuthority -> System.out.println(grantedAuthority.getAuthority())
         );
 
+        String scope = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(authority -> !authority.startsWith("ROLE_"))
+                .collect(Collectors.joining(""));
+
         Instant now = Instant.now();
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .id(userDetails.getUsername())
@@ -43,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
                 .issuedAt(now)
                 .expiresAt(now.plus(5, ChronoUnit.MINUTES))
                 .issuer(userDetails.getUsername())
+                .claim("scope",scope) //use for detail of accessing
                 .build();
 
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
@@ -53,4 +65,8 @@ public class AuthServiceImpl implements AuthService {
                 ""
         );
     }
+
+    //refresh payload with jwt
+
+
 }

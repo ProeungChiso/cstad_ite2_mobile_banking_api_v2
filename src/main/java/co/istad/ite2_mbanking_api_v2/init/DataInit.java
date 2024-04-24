@@ -1,11 +1,13 @@
 package co.istad.ite2_mbanking_api_v2.init;
 
 import co.istad.ite2_mbanking_api_v2.domain.AccountType;
+import co.istad.ite2_mbanking_api_v2.domain.Authority;
 import co.istad.ite2_mbanking_api_v2.domain.CardType;
 import co.istad.ite2_mbanking_api_v2.domain.Role;
 import co.istad.ite2_mbanking_api_v2.feature.account.AccountRepository;
 import co.istad.ite2_mbanking_api_v2.feature.accounttype.AccountTypeRepository;
 import co.istad.ite2_mbanking_api_v2.feature.cardType.CardTypeRepository;
+import co.istad.ite2_mbanking_api_v2.feature.user.AuthorityRepository;
 import co.istad.ite2_mbanking_api_v2.feature.user.RoleRepository;
 import co.istad.ite2_mbanking_api_v2.feature.user.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -20,28 +22,76 @@ public class DataInit {
     private final RoleRepository roleRepository;
     private final AccountTypeRepository accountTypeRepository;
     private final CardTypeRepository cardTypeRepository;
-
+    private final AuthorityRepository authorityRepository;
     @PostConstruct
     void initRole() {
 
         if (roleRepository.count() < 1) {
+
+            Authority userRead = new Authority();
+            userRead.setName("user:read");
+            Authority userWrite = new Authority();
+            userWrite.setName("user:write");
+
+            Authority transactionRead = new Authority();
+            transactionRead.setName("transaction:read");
+            Authority transactionWrite = new Authority();
+            transactionWrite.setName("transaction:write");
+
+            Authority accountRead = new Authority();
+            accountRead.setName("account:read");
+            Authority accountWrite = new Authority();
+            accountWrite.setName("account:write");
+
+            Authority accountTypeRead = new Authority();
+            accountTypeRead.setName("account:type:read");
+            Authority accountTypeWrite = new Authority();
+            accountTypeWrite.setName("account:type:write");
+
             Role user = new Role();
             user.setName("USER");
+            user.setAuthorities(
+                    List.of(
+                            userRead,
+                            transactionRead,
+                            accountRead,
+                            accountTypeRead
+                    )
+            );
 
             Role customer = new Role();
             customer.setName("CUSTOMER");
+            customer.setAuthorities(
+                    List.of(
+                            userWrite,
+                            transactionWrite,
+                            accountTypeWrite
+                    )
+            );
+
 
             Role staff = new Role();
             staff.setName("STAFF");
+            staff.setAuthorities(
+                    List.of(
+                            accountTypeWrite
+                    )
+            );
 
             Role admin = new Role();
             admin.setName("ADMIN");
+            admin.setAuthorities(
+                    List.of(
+                            userWrite,
+                            accountWrite,
+                            accountTypeWrite
+                    )
+            );
 
             roleRepository.saveAll(
                     List.of(user, customer, staff, admin)
             );
         }
-
     }
 
     @PostConstruct
