@@ -45,6 +45,7 @@ public class SecurityConfig {
     @Bean
     JwtAuthenticationProvider jwtAuthenticationProvider(@Qualifier("refreshJwtDecoder") JwtDecoder refreshJwtDecoder) {
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(refreshJwtDecoder);
+
         return provider;
     }
 
@@ -87,13 +88,14 @@ public class SecurityConfig {
 
         //Disable CSRF
         http.csrf(token -> token.disable());
+
         //Change to STATELESS
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
 
-    //JWT Access Token
+    //JWT Access-Token
     @Primary
     @Bean
     JWKSource<SecurityContext> jwkSource() {
